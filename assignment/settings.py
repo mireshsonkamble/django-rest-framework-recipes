@@ -85,11 +85,6 @@ DATABASES = {
     }
 }
 
-# CORS settings
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://d3gxsriinbssiv.cloudfront.net",
-]
 
 CORS_ALLOW_HEADERS = [
     'content-type',
