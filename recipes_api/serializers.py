@@ -1,6 +1,5 @@
 # serializers.py
 from rest_framework import serializers
-from django.utils import timezone
 from .models import Recipe
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -17,6 +16,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.ingredients = validated_data.get("ingredients", instance.ingredients)
         instance.steps = validated_data.get("steps", instance.steps)
         instance.preparationTime = int(validated_data.get("preparationTime", instance.preparationTime))
-        instance.last_modified = timezone.now()
+        instance.last_modified = int(validated_data.get("preparationTime", instance.preparationTime))
         instance.save()
         return instance
