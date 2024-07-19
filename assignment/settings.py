@@ -96,6 +96,7 @@ CORS_ALLOW_HEADERS = [
 # Configure CORS
 CORS_ALLOWED_ORIGINS = [
     "http://my-recipe-react-app.s3-website-us-east-1.amazonaws.com",
+    "http://d1o21ryn23rx0w.cloudfront.net",
 ]
 
 # Password validation
