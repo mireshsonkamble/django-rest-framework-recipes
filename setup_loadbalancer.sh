@@ -4,7 +4,7 @@
 # Provide the list of backend server IP
 #first make sure to execute to First, ensure that mod_rewrite is enabled: sudo a2enmod rewrite
 # Variables
-iplist=("10.0.2.116:8000" "10.0.2.121:8000")
+iplist=("10.0.2.213:8000")
 service_name="apache2.service"
 config_file="lb.conf"
 path_to_apache_config_dir="/etc/apache2/sites-available"

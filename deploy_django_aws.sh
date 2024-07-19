@@ -3,10 +3,11 @@
 # It must be run with superuser (sudo) privileges.
 
 # Variables
-url_to_github_repo="https://github.com/mireshsonkamble/django-rest-framework-recipes.git"
+url_to_github_repo="https://github.com/prabinkc2046/django-hello-world.git"
 local_repo=$(echo "$url_to_github_repo" | awk -F/ '{print $NF}' | awk 'split($1, a, "."){print a[1]}')
+#server_ip=$(ip addr show | grep inet | awk 'NR == 3 {print $2}' | awk 'split($1, a, "/") {print a[1]}')
 service_file_name="django.service"
-path_to_service_file="/etc/systemd/system/$service_file_name"
+path_to_service_file=/etc/systemd/system/$service_file_name
 
 # Set DEBIAN_FRONTEND to noninteractive to prevent prompts
 export DEBIAN_FRONTEND=noninteractive
@@ -27,58 +28,46 @@ fi
 
 # Git clone the repository
 git clone "$url_to_github_repo"
-if [ "$?" -ne "0" ]; then
-    echo "Error occurred while cloning the repository. Exiting..."
-    exit 3
-fi
 
 # Change to the cloned repository directory
-cd "$local_repo" || exit 4
+cd "$local_repo"
 
 # Initialize the Python virtual environment
 python3 -m venv venv
+
+# Activate the virtual environment
 source venv/bin/activate
 
-# Install Django, Gunicorn, Django Rest Framework, and Django CORS Headers
-pip install django gunicorn djangorestframework django-cors-headers
-if [ "$?" -ne "0" ]; then
-    echo "Error occurred while installing Django, Gunicorn, Django Rest Framework, and Django CORS Headers. Exiting..."
-    exit 5
-fi
+# Install Django and Gunicorn
+pip install django gunicorn
 
 # Find the project directory name containing "manage.py"
 path_to_manage_py_file=$(find . -type f -name "manage.py")
-project_dir=$(dirname "$path_to_manage_py_file")
+project_dir=$(echo "$path_to_manage_py_file" | awk -F/ '{print $(NF - 1)}')
 
 # Change to the Django project directory
-cd "$project_dir" || exit 6
+cd "$project_dir"
 
-# Path to settings.py file
-path_to_settings_py_file="$project_dir/manage.py"
+# Find the path to the "settings.py" file from the current directory
+path_to_setting_file=$(find . -type f -name "settings.py")
 
-# Modify the "ALLOWED_HOSTS" line to include all hosts
-sed -i "s/^ALLOWED_HOSTS = \[''\]$/ALLOWED_HOSTS = ['*']/" "$path_to_settings_py_file"
-
-# Run Django migrations
-echo "Running Django migrations..."
-python manage.py migrate
+# Modify the "ALLOWED_HOSTS=['']" line to include the server IP
+sed -i "s/^ALLOWED_HOSTS = \[''\]$/ALLOWED_HOSTS = ['*']/" "$path_to_setting_file"
 
 # Obtain the absolute path to the Gunicorn binary and the current working directory
 path_to_gunicorn_bin=$(which gunicorn)
 working_dir=$(pwd)
 
 # Create a "django.service" file at /etc/systemd/system/
-cat > "$path_to_service_file" << EOF
+cat > $path_to_service_file << EOF
 [Unit]
-Description=Django application server using Gunicorn
+Description=A service file for Django application server
 After=network.target
 
 [Service]
-User=ubuntu  # Replace with your Ubuntu user that owns the Django project
-Group=www-data  # Replace with the appropriate group if needed
-WorkingDirectory=$working_dir
-ExecStart=$path_to_gunicorn_bin --workers 4 --bind=0.0.0.0:8000 $project_dir.wsgi:application
+ExecStart=$path_to_gunicorn_bin --workers=4 --bind=0.0.0.0:8000 $project_dir.wsgi:application
 Restart=always
+WorkingDirectory=$working_dir
 
 [Install]
 WantedBy=multi-user.target
@@ -89,22 +78,22 @@ echo "Service file: $service_file_name has been created."
 # Reload the systemd daemon
 systemctl daemon-reload
 
-# Start and enable the Django service to start at boot
+# Start the Django service
 if systemctl start $service_file_name; then
     echo "$service_file_name is started successfully."
 else
-    echo "Error occurred in starting $service_file_name. Exiting..."
-    exit 7
+    echo "Error occured in starting $service_file_name. Exiting..."
+    exit 3
 fi
 
+# Enable the Django service to start at boot
 if systemctl enable $service_file_name; then
     echo "$service_file_name enabled successfully."
 else
-    echo "Error occurred in enabling $service_file_name. Exiting..."
-    exit 8
+    echo "Error occured in enabling $service_file_name. Exiting..."
+    exit 4
 fi
 
 # Deactivate the virtual environment
+echo "Deactivating the virtual environment"
 deactivate
-
-echo "Deployment and configuration completed successfully."
