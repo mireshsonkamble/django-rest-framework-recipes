@@ -3,7 +3,7 @@
 # It must be run with superuser (sudo) privileges.
 
 # Variables
-url_to_github_repo="https://github.com/prabinkc2046/django-hello-world.git"
+url_to_github_repo="https://github.com/mireshsonkamble/django-rest-framework-recipes.git"
 local_repo=$(echo "$url_to_github_repo" | awk -F/ '{print $NF}' | awk 'split($1, a, "."){print a[1]}')
 #server_ip=$(ip addr show | grep inet | awk 'NR == 3 {print $2}' | awk 'split($1, a, "/") {print a[1]}')
 service_file_name="django.service"
@@ -39,7 +39,7 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Install Django and Gunicorn
-pip install django gunicorn
+pip install django gunicorn djangorestframework django-cors-headers
 
 # Find the project directory name containing "manage.py"
 path_to_manage_py_file=$(find . -type f -name "manage.py")
@@ -52,7 +52,10 @@ cd "$project_dir"
 path_to_setting_file=$(find . -type f -name "settings.py")
 
 # Modify the "ALLOWED_HOSTS=['']" line to include the server IP
-sed -i "s/^ALLOWED_HOSTS = \[''\]$/ALLOWED_HOSTS = ['*']/" "$path_to_setting_file"
+sed -i "s/^ALLOWED_HOSTS = \[''\]$/ALLOWED_HOSTS = ['*']/" "./assignment/settings.py"
+
+# Run Django migrations
+python manage.py migrate
 
 # Obtain the absolute path to the Gunicorn binary and the current working directory
 path_to_gunicorn_bin=$(which gunicorn)
@@ -65,7 +68,7 @@ Description=A service file for Django application server
 After=network.target
 
 [Service]
-ExecStart=$path_to_gunicorn_bin --workers=4 --bind=0.0.0.0:8000 $project_dir.wsgi:application
+ExecStart=$path_to_gunicorn_bin --workers=4 --bind=0.0.0.0:8000 assignment.wsgi:application
 Restart=always
 WorkingDirectory=$working_dir
 
@@ -82,7 +85,7 @@ systemctl daemon-reload
 if systemctl start $service_file_name; then
     echo "$service_file_name is started successfully."
 else
-    echo "Error occured in starting $service_file_name. Exiting..."
+    echo "Error occurred in starting $service_file_name. Exiting..."
     exit 3
 fi
 
@@ -90,7 +93,7 @@ fi
 if systemctl enable $service_file_name; then
     echo "$service_file_name enabled successfully."
 else
-    echo "Error occured in enabling $service_file_name. Exiting..."
+    echo "Error occurred in enabling $service_file_name. Exiting..."
     exit 4
 fi
 
