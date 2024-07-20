@@ -93,6 +93,12 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+# Configure CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://my-recipe-react-app.s3-website-us-east-1.amazonaws.com",
+    "http://d1x17oetqbmx2.cloudfront.net",
+]
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
