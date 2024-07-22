@@ -1,0 +1,13 @@
+.contact-us-container {
+    padding: 20px;
+    background-color: #f8f9fa; /* Optional: Change to your preferred background color */
+  }
+  
+  .contact-us-container h2 {
+    margin-bottom: 20px;
+  }
+  
+  .contact-us-container .form-group {
+    margin-bottom: 15px;
+  }
+  

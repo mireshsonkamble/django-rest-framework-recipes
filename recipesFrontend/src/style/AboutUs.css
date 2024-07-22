@@ -1,0 +1,22 @@
+.about-us-container {
+    padding: 50px 0;
+  }
+  
+  .card {
+    border-radius: 10px;
+    border: 2px solid #B4E380;
+    background-color: #F9F9F9;
+  }
+  
+  .card-title {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .card-text {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  
